@@ -1,0 +1,149 @@
+﻿CREATE DATABASE QLTHUVIEN
+GO
+USE QLTHUVIEN
+GO
+
+--Tạo bảng Tham số
+CREATE TABLE [THAMSO](
+	[TenThamSo] [nvarchar](40) NOT NULL,
+	[GiaTri] [int] NULL,
+	CONSTRAINT [PK_THAMSO] PRIMARY KEY (TenThamSo)
+)
+GO
+--Tạo bảng Bằng cấp
+CREATE TABLE [BANGCAP](
+	[MaBangCap] int Identity(1,1),
+	[TenBangCap] [nvarchar](40) NULL,
+	CONSTRAINT [PK_BANGCAP] PRIMARY KEY (MaBangCap)
+)
+GO
+--Tạo bảng Nhân viên
+CREATE TABLE [NHANVIEN](
+	[MaNhanVien] int Identity(1,1),
+	[HoTenNhanVien] [nvarchar](50) NULL,
+	[NgaySinh] [datetime] NULL,
+	[DiaChi] [nvarchar](50) NULL,
+	[DienThoai] [nvarchar](15) NULL,
+	[MaBangCap] [int] NULL,
+	CONSTRAINT [PK_NHANVIEN] PRIMARY KEY (MaNhanVien)
+)
+GO
+--Tạo bảng Độc giả
+CREATE TABLE [DOCGIA](
+	[MaDocGia] int Identity(1,1),
+	[HoTenDocGia] [nvarchar](40) NULL,
+	[NgaySinh] [datetime] NULL,
+	[DiaChi] [nvarchar](50) NULL,
+	[Email] [nvarchar](30) NULL,
+	[NgayLapThe] [datetime] NULL,
+	[NgayHetHan] [datetime] NULL,
+	[TienNo] [float] NULL,
+	CONSTRAINT [PK_DOCGIA] PRIMARY KEY (MaDocGia)
+)
+GO
+--Tạo bảng Phiếu thu tiền
+CREATE TABLE [PHIEUTHUTIEN](
+	[MaPhieuThuTien] int Identity(1,1),
+	[SoTienNo] [float] NULL,
+	[SoTienThu] [float] NULL,
+	[MaDocGia] [int] NULL,
+	[MaNhanVien] [int] NULL,
+	CONSTRAINT [PK_PHIEUTHUTIEN] PRIMARY KEY (MaPhieuThuTien)
+)
+GO
+--Tạo bảng Sách
+CREATE TABLE [SACH](
+	[MaSach] int Identity(1,1),
+	[TenSach] [nvarchar](40) NULL,
+	[TacGia] [nvarchar](30) NULL,
+	[NamXuatBan] [int] NULL,
+	[NhaXuatBan] [nvarchar](40) NULL,
+	[TriGia] [float] NULL,
+	[NgayNhap] [datetime] NULL,
+	CONSTRAINT [PK_SACH] PRIMARY KEY (MaSach)
+)
+GO
+--Tạo bảng Phiếu mượn sách
+CREATE TABLE [PHIEUMUONSACH](
+	[MaPhieuMuon] int Identity(1,1),
+	[NgayMuon] [datetime] NOT NULL,
+	[MaDocGia] [int] NULL,
+	CONSTRAINT [PK_PHIEUMUONSACH] PRIMARY KEY (MaPhieuMuon)
+)
+--Tạo bảng Chi tiết phiếu mượn
+CREATE TABLE [CHITIETPHIEUMUON](
+	[MaSach] [int] NOT NULL,
+	[MaPhieuMuon] [int] NOT NULL,
+	CONSTRAINT [PK_CHITIETPHIEUMUON] PRIMARY KEY (MaSach,MaPhieuMuon)
+)
+GO
+
+
+--Tạo khoá ngoại
+ALTER TABLE [NHANVIEN] WITH NOCHECK ADD CONSTRAINT [FK_NHANVIEN_BANGCAP]
+	FOREIGN KEY([MaBangCap])
+	REFERENCES [BANGCAP] ([MaBangCap])
+	ON UPDATE CASCADE
+	ON DELETE CASCADE
+GO
+ALTER TABLE [NHANVIEN] CHECK CONSTRAINT [FK_NHANVIEN_BANGCAP]
+GO
+
+ALTER TABLE [PHIEUTHUTIEN] WITH CHECK ADD CONSTRAINT [FK_PHIEUTHUTIEN_DOCGIA]
+	FOREIGN KEY([MaDocGia])
+	REFERENCES [DOCGIA] ([MaDocGia])
+GO
+ALTER TABLE [PHIEUTHUTIEN] CHECK CONSTRAINT [FK_PHIEUTHUTIEN_DOCGIA]
+GO
+
+ALTER TABLE [PHIEUTHUTIEN] WITH CHECK ADD CONSTRAINT
+	[FK_PHIEUTHUTIEN_NHANVIEN] FOREIGN KEY([MaNhanVien])
+	REFERENCES [NHANVIEN] ([MaNhanVien])
+	ON UPDATE CASCADE
+	ON DELETE CASCADE
+GO
+ALTER TABLE [PHIEUTHUTIEN] CHECK CONSTRAINT [FK_PHIEUTHUTIEN_NHANVIEN]
+GO
+
+ALTER TABLE [PHIEUMUONSACH] WITH CHECK ADD CONSTRAINT
+	[FK_PHIEUMUONSACH_DOCGIA] FOREIGN KEY([MaDocGia])
+	REFERENCES [DOCGIA] ([MaDocGia])
+	ON UPDATE CASCADE
+	ON DELETE CASCADE
+GO
+ALTER TABLE [PHIEUMUONSACH] CHECK CONSTRAINT [FK_PHIEUMUONSACH_DOCGIA]
+GO
+
+ALTER TABLE [CHITIETPHIEUMUON] WITH CHECK ADD CONSTRAINT
+	[FK_CHITIETPHIEUMUON_PHIEUMUONSACH] FOREIGN KEY([MaPhieuMuon])
+	REFERENCES [PHIEUMUONSACH] ([MaPhieuMuon])
+GO
+ALTER TABLE [CHITIETPHIEUMUON] CHECK CONSTRAINT [FK_CHITIETPHIEUMUON_PHIEUMUONSACH]
+GO
+
+ALTER TABLE [CHITIETPHIEUMUON] WITH CHECK ADD CONSTRAINT
+	[FK_CHITIETPHIEUMUON_SACH] FOREIGN KEY([MaSach])
+	REFERENCES [SACH] ([MaSach])
+	ON UPDATE CASCADE
+	ON DELETE CASCADE
+GO
+ALTER TABLE [CHITIETPHIEUMUON] CHECK CONSTRAINT [FK_CHITIETPHIEUMUON_SACH]
+
+
+---Nhap lieu
+insert into BANGCAP values(N'Tiến sĩ')
+insert into BANGCAP values(N'Thạc sĩ')
+insert into BANGCAP values(N'Đại học')
+insert into BANGCAP values(N'Cao đẳng')
+insert into BANGCAP values(N'Trung cấp')
+
+insert into NHANVIEN values(N'PHẠM MINH VŨ','01/24/1980',N'163/30 Thành Thái F.14 Q.10 TPHCM','0905646162',1)
+insert into NHANVIEN values(N'NGUYỄN MINH THÀNH','04/05/1983',N'41/4 CALMETTE Q1 TPHCM','0908373612',2)
+insert into NHANVIEN values(N'NGUYỄN HÀ MY','04/13/1985',N'178 NAM KỲ KHỞI NGHĨA Q4 TPHCM','0908783274',3)
+insert into DOCGIA values(N'NGUYỄN HOÀNG MINH','02/23/1990',N'41/4 CALMETTE Q1 TPHCM',N'hoangminh@yahoo.com','12/30/2000','12/30/2012',0)
+insert into DOCGIA values(N'TRẦN VĂN CHÂU','08/29/1992',N'TRẦN HƯNG ĐẠO Q1 TPHCM',N'vanchau@yahoo.com','11/22/2001','11/22/2013',0)
+insert into DOCGIA values(N'NGUYỄN HOÀNG NAM','02/21/1980',N'4 TRẦN ĐÌNH HƯNG Q1 TPHCM',N'hoangmNAM@yahoo.com','12/22/2001','12/30/2012',150000)
+insert into DOCGIA values(N'TRẦN THANH PHÚC','08/19/1993',N'TRƯƠNG ĐỊNH Q.TB TPHCM',N'thanhphuc@yahoo.com','08/09/2001','11/22/2013',50000)
+insert into SACH values(N'Công Nghệ Phần mềm',N'Lương Trần Hy Hiến',2022,N'NXB ĐH Sư phạm TPHCM',55000,'12/03/2022')
+insert into SACH values(N'Cấu trúc Dữ liệu',N'Lương Trần Ngọc Khiết',2022,N'NXB ĐH Sư phạm TPHCM',55000,'12/03/2022')
+insert into SACH values(N'Thiết kế Web',N'Lương Trần Hy Hiến',2023,N'NXB ĐH Sư phạm TPHCM',95000,'22/02/2023')
