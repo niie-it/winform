@@ -11,7 +11,7 @@ public class DataProvider
 {
     public static string ChuoiKetNoi
     {
-        get { return "Server=.; Database=QLHocSinh; Integrated Securoty=True"; }
+        get { return "Server=.; Database=QLHocSinh; Integrated Security=True"; }
     }
     public static bool TruyVan_XuLy(string sql)
     {
